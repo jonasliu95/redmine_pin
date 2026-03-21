@@ -2,6 +2,8 @@
 
 A Redmine plugin that allows users to independently pin their favorite issues to a private pin board for quick access.
 
+Compatible with Redmine 6.X and 5.X versions.
+
 ## Screenshots
 
 ### Pinning an Issue
@@ -63,8 +65,6 @@ A Redmine plugin that allows users to independently pin their favorite issues to
 4. From the Pins dashboard, you can view your pinned issues, toggle between Grid and List views, sort, group, and unpin tasks.
 
 ## Compatibility
-
-Tested successfully on Redmine 5.x and 6.x.
 
 | Locale | Status |
 |--------|--------|
