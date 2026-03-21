@@ -1,0 +1,42 @@
+<h2><%= l(:label_pinned_tasks, default: 'Pinned Tasks') %></h2>
+
+<div class="pins-toolbar">
+  <%= form_tag(pins_path, method: :get, id: 'pins_filter_form') do %>
+    <div class="filters">
+      <label for="view_mode"><%= l(:label_view_mode, default: 'View Mode') %>:</label>
+      <%= select_tag 'view_mode', options_for_select([[l(:label_view_list, default: 'List'), 'list'], [l(:label_view_grid, default: 'Grid'), 'grid']], @view_mode), onchange: 'this.form.submit();' %>
+
+      <label for="sort"><%= l(:label_sort, default: 'Sort by') %>:</label>
+      <%= select_tag 'sort', options_for_select([
+        [l(:label_date_added, default: 'Date Added'), 'date'],
+        [l(:field_project), 'project'],
+        [l(:field_status), 'status'],
+        [l(:field_priority), 'priority'],
+        [l(:field_subject), 'subject'],
+        [l(:field_assigned_to), 'assignee']
+      ], params[:sort] || 'date'), onchange: 'this.form.submit();' %>
+
+      <%= select_tag 'order', options_for_select([[l(:label_descending, default: 'Descending'), 'desc'], [l(:label_ascending, default: 'Ascending'), 'asc']], params[:order] || 'desc'), onchange: 'this.form.submit();' %>
+
+      <label style="margin-left: 10px;">
+        <%= check_box_tag 'group_by_project', '1', @group_by_project, onchange: 'this.form.submit();' %>
+        <%= l(:label_group_by_project, default: 'Group by project') %>
+      </label>
+    </div>
+  <% end %>
+</div>
+
+<% if @pins.empty? %>
+  <p class="nodata"><%= l(:label_no_data, default: 'No data to display') %></p>
+<% else %>
+  <% if @group_by_project %>
+    <% @pins_by_project.keys.sort_by { |p| p ? p.name : '' }.each do |project| %>
+      <div class="project-group">
+        <h3 class="project-group-title"><%= project ? link_to_project(project) : 'None' %></h3>
+        <%= render partial: "pins/#{@view_mode}_view", locals: { pins: @pins_by_project[project] } %>
+      </div>
+    <% end %>
+  <% else %>
+    <%= render partial: "pins/#{@view_mode}_view", locals: { pins: @pins } %>
+  <% end %>
+<% end %>

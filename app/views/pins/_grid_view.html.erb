@@ -1,0 +1,18 @@
+<div class="pins-grid">
+  <% pins.each do |pin| %>
+    <div class="pin-card" id="pinned-issue-<%= pin.issue.id %>">
+      <div class="pin-card-header">
+        <h4><%= link_to_issue(pin.issue, project: pin.issue.project) %></h4>
+      </div>
+      <div class="pin-card-meta">
+        <p><strong><%= l(:field_project) %>:</strong> <%= link_to_project(pin.issue.project) %></p>
+        <p><strong><%= l(:field_status) %>:</strong> <%= pin.issue.status.name %></p>
+        <p><strong><%= l(:field_priority) %>:</strong> <%= pin.issue.priority.name %></p>
+        <p><strong><%= l(:field_assigned_to) %>:</strong> <%= link_to_user(pin.issue.assigned_to) || '-' %></p>
+      </div>
+      <div class="pin-card-footer">
+        <%= link_to l(:button_unpin, default: 'Unpin'), toggle_pins_path(issue_id: pin.issue.id), method: :post, remote: true, class: 'icon icon-del' %>
+      </div>
+    </div>
+  <% end %>
+</div>

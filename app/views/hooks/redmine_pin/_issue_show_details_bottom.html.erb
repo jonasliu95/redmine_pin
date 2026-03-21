@@ -1,0 +1,23 @@
+<% if User.current.logged? && (Setting.plugin_redmine_pin.is_a?(Hash) ? Setting.plugin_redmine_pin['enabled'] == '1' : true) %>
+  <% pinned = Pin.exists?(user_id: User.current.id, issue_id: @issue.id) %>
+  
+  <div id="redmine-pin-button-container" style="display: none;">
+    <%= link_to (pinned ? 'Unpin' : 'Pin'), 
+                toggle_pins_path(issue_id: @issue.id), 
+                method: :post, 
+                remote: true, 
+                class: "icon #{pinned ? 'icon-unpin' : 'icon-pin'}", 
+                id: 'redmine-pin-toggle-btn' %>
+  </div>
+  
+  <script type="text/javascript">
+    $(document).ready(function() {
+      // Move the pin button to the contextual menu in the issue box
+      var $contextual = $('#content > .contextual').first();
+      if ($contextual.length > 0) {
+        var $btn = $('#redmine-pin-button-container').children();
+        $contextual.append($btn);
+      }
+    });
+  </script>
+<% end %>

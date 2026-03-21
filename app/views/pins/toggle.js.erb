@@ -1,0 +1,10 @@
+<% if @pinned %>
+  $('#redmine-pin-toggle-btn').removeClass('icon-pin').addClass('icon-unpin').text('<%= j l(:button_unpin, default: "Unpin") %>');
+<% else %>
+  $('#redmine-pin-toggle-btn').removeClass('icon-unpin').addClass('icon-pin').text('<%= j l(:button_pin, default: "Pin") %>');
+  
+  // If we are on the pins index page, remove the unpinned element instantly
+  $('#pinned-issue-<%= @issue.id %>').fadeOut(300, function() { 
+    $(this).remove(); 
+  });
+<% end %>
