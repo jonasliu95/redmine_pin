@@ -1,4 +1,20 @@
 class PinsController < ApplicationController
+  VIEW_MODES = %w[list grid].freeze
+  SORTS = {
+    'date' => 'pins.created_at',
+    'project' => 'projects.name',
+    'status' => 'issue_statuses.position',
+    'priority' => 'enumerations.position',
+    'subject' => 'issues.subject',
+    'assignee' => 'users.lastname'
+  }.freeze
+  SORT_JOINS = {
+    'project' => 'LEFT JOIN projects ON issues.project_id = projects.id',
+    'status' => 'LEFT JOIN issue_statuses ON issues.status_id = issue_statuses.id',
+    'priority' => 'LEFT JOIN enumerations ON issues.priority_id = enumerations.id',
+    'assignee' => 'LEFT JOIN users ON issues.assigned_to_id = users.id'
+  }.freeze
+
   before_action :require_login
   before_action :require_plugin_enabled
   before_action :find_issue, only: [:toggle]
@@ -7,34 +23,17 @@ class PinsController < ApplicationController
     @pins = Pin.where(user_id: User.current.id, issue_id: Issue.visible.select(:id)).
               joins(:issue).
               includes(issue: [:project, :status, :priority, :assigned_to])
-    
-    # Handle view modes (list/grid)
-    @view_mode = params[:view_mode] || 'list'
-    
-    # Support grouping by project
+
+    @view_mode = VIEW_MODES.include?(params[:view_mode]) ? params[:view_mode] : 'list'
     @group_by_project = params[:group_by_project] == '1'
-    
-    # Basic sorting
-    sort_by = params[:sort] || 'created_at'
-    sort_order = params[:order] == 'desc' ? 'desc' : 'asc'
-    
-    case sort_by
-    when 'date'
-      @pins = @pins.order("pins.created_at #{sort_order}")
-    when 'project'
-      @pins = @pins.joins(:issue).joins("LEFT JOIN projects ON issues.project_id = projects.id").order("projects.name #{sort_order}")
-    when 'status'
-      @pins = @pins.joins(:issue).joins("LEFT JOIN issue_statuses ON issues.status_id = issue_statuses.id").order("issue_statuses.position #{sort_order}")
-    when 'priority'
-      @pins = @pins.joins(:issue).joins("LEFT JOIN enumerations ON issues.priority_id = enumerations.id").order("enumerations.position #{sort_order}")
-    when 'subject'
-      @pins = @pins.joins(:issue).order("issues.subject #{sort_order}")
-    when 'assignee'
-      @pins = @pins.joins(:issue).joins("LEFT JOIN users ON issues.assigned_to_id = users.id").order("users.lastname #{sort_order}, users.firstname #{sort_order}")
-    else
-      @pins = @pins.order("pins.created_at #{sort_order}")
+    @sort = SORTS.key?(params[:sort]) ? params[:sort] : 'date'
+    @order = params[:order] == 'asc' ? 'asc' : 'desc'
+
+    if (join = SORT_JOINS[@sort])
+      @pins = @pins.joins(join)
     end
-    
+    @pins = @pins.order(sort_expression)
+
     if @group_by_project
       @pins_by_project = @pins.group_by { |p| p.issue.project }
     end
@@ -61,6 +60,14 @@ class PinsController < ApplicationController
   end
 
   private
+
+  def sort_expression
+    if @sort == 'assignee'
+      "users.lastname #{@order}, users.firstname #{@order}"
+    else
+      "#{SORTS[@sort]} #{@order}"
+    end
+  end
 
   def require_plugin_enabled
     render_403 unless RedminePin.enabled?

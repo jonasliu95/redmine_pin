@@ -14,9 +14,9 @@
         [l(:field_priority), 'priority'],
         [l(:field_subject), 'subject'],
         [l(:field_assigned_to), 'assignee']
-      ], params[:sort] || 'date'), onchange: 'this.form.submit();' %>
+      ], @sort), onchange: 'this.form.submit();' %>
 
-      <%= select_tag 'order', options_for_select([[l(:label_descending, default: 'Descending'), 'desc'], [l(:label_ascending, default: 'Ascending'), 'asc']], params[:order] || 'desc'), onchange: 'this.form.submit();' %>
+      <%= select_tag 'order', options_for_select([[l(:label_descending, default: 'Descending'), 'desc'], [l(:label_ascending, default: 'Ascending'), 'asc']], @order), onchange: 'this.form.submit();' %>
 
       <label style="margin-left: 10px;">
         <%= check_box_tag 'group_by_project', '1', @group_by_project, onchange: 'this.form.submit();' %>

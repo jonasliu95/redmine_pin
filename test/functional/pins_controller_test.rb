@@ -42,6 +42,36 @@ class PinsControllerTest < Redmine::ControllerTest
     end
   end
 
+  def test_index_unknown_view_mode_falls_back_to_list
+    create_three_pins
+    get :index, params: { view_mode: 'foo' }
+    assert_response :success
+    assert_select 'table.list.issues'
+  end
+
+  def test_index_grid_view
+    create_three_pins
+    get :index, params: { view_mode: 'grid' }
+    assert_select '.pins-grid .pin-card', 3
+  end
+
+  def test_index_default_sort_is_newest_first
+    create_three_pins(created_at: { 1 => 3.days.ago, 2 => 2.days.ago, 3 => 1.day.ago })
+    get :index
+    ids = css_select('tr[id^="pinned-issue-"]').map { |tr| tr['id'] }
+    assert_equal %w[pinned-issue-3 pinned-issue-2 pinned-issue-1], ids
+    assert_select 'select#order option[selected][value=desc]'
+    assert_select 'select#sort option[selected][value=date]'
+  end
+
+  def test_index_every_sort_and_order_renders
+    create_three_pins
+    %w[date project status priority subject assignee bogus].product(%w[asc desc]).each do |sort, order|
+      get :index, params: { sort: sort, order: order, group_by_project: '1' }
+      assert_response :success, "#{sort}/#{order}"
+    end
+  end
+
   def test_toggle_survives_unique_index_race
     other_pin = Pin.create!(user: User.find(2), issue: Issue.find(1))
     Pin.stubs(:find_by).returns(nil) # our lookup ran before the other request committed
@@ -53,6 +83,13 @@ class PinsControllerTest < Redmine::ControllerTest
   end
 
   private
+
+  def create_three_pins(created_at: {})
+    [1, 2, 3].each do |issue_id|
+      pin = Pin.create!(user: User.find(2), issue: Issue.find(issue_id))
+      pin.update_column(:created_at, created_at[issue_id]) if created_at[issue_id]
+    end
+  end
 
   def hidden_issue
     @hidden_issue ||= begin
