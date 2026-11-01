@@ -1,4 +1,4 @@
-<% if User.current.logged? && (Setting.plugin_redmine_pin.is_a?(Hash) ? Setting.plugin_redmine_pin['enabled'] == '1' : true) %>
+<% if User.current.logged? && RedminePin.enabled? %>
   <% pinned = Pin.exists?(user_id: User.current.id, issue_id: @issue.id) %>
   
   <div id="redmine-pin-button-container" style="display: none;">

@@ -29,7 +29,5 @@ Redmine::Plugin.register :redmine_pin do
   menu :top_menu, :pins, { controller: 'pins', action: 'index' },
        caption: 'Pins',
        after: :projects,
-       if: proc { User.current.logged? && (Setting.plugin_redmine_pin.is_a?(Hash) ? Setting.plugin_redmine_pin['enabled'] == '1' : true) }
-
-  permission :view_pins, { pins: [:index, :toggle] }, public: true
+       if: proc { User.current.logged? && RedminePin.enabled? }
 end

@@ -1,10 +1,12 @@
 class PinsController < ApplicationController
   before_action :require_login
+  before_action :require_plugin_enabled
   before_action :find_issue, only: [:toggle]
 
   def index
-    # Use joins(:issue) to filter out any orphaned pins where the issue was deleted
-    @pins = Pin.where(user_id: User.current.id).joins(:issue).includes(issue: [:project, :status, :priority])
+    @pins = Pin.where(user_id: User.current.id, issue_id: Issue.visible.select(:id)).
+              joins(:issue).
+              includes(issue: [:project, :status, :priority, :assigned_to])
     
     # Handle view modes (list/grid)
     @view_mode = params[:view_mode] || 'list'
@@ -44,7 +46,11 @@ class PinsController < ApplicationController
       pin.destroy
       @pinned = false
     else
-      Pin.create(user: User.current, issue: @issue)
+      begin
+        Pin.create!(user: User.current, issue: @issue)
+      rescue ActiveRecord::RecordNotUnique
+        # Another request pinned the same issue between our lookup and insert.
+      end
       @pinned = true
     end
     
@@ -56,8 +62,12 @@ class PinsController < ApplicationController
 
   private
 
+  def require_plugin_enabled
+    render_403 unless RedminePin.enabled?
+  end
+
   def find_issue
-    @issue = Issue.find(params[:issue_id])
+    @issue = Issue.visible.find(params[:issue_id])
   rescue ActiveRecord::RecordNotFound
     render_404
   end
