@@ -2,7 +2,7 @@
 
 A Redmine plugin that allows users to independently pin their favorite issues to a private pin board for quick access.
 
-Compatible with Redmine 6.X and 5.X versions.
+Compatible with Redmine 6.0+ and 7.0 (Rails 7.2 / 8.1).
 
 ## Screenshots
 
@@ -37,10 +37,15 @@ Compatible with Redmine 6.X and 5.X versions.
 2. Run the plugin migrations:
    ```bash
    cd /path/to/redmine
-   bundle exec rake redmine:plugins:migrate RAILS_ENV=production
+   bundle exec rake redmine:plugins:migrate NAME=redmine_pin RAILS_ENV=production
    ```
 
-3. Restart your Redmine instance:
+3. Precompile the assets (required in production):
+   ```bash
+   bundle exec rake assets:precompile RAILS_ENV=production
+   ```
+
+4. Restart your Redmine instance:
    ```bash
    # For Passenger
    touch tmp/restart.txt
@@ -48,14 +53,20 @@ Compatible with Redmine 6.X and 5.X versions.
    # For other servers, restart accordingly
    ```
 
-4. Go to **Administration → Plugins** to verify the plugin is loaded.
+5. Go to **Administration → Plugins** to verify the plugin is loaded.
 
 ## Configuration
 
 1. Navigate to **Administration → Plugins**
 2. Find "Redmine Pin plugin" and click **Configure**
-3. Ensure the plugin is enabled.
-4. Save settings.
+3. Tick **Enable pinning** and save the settings.
+
+Disabling the plugin removes the "Pins" menu entry and the pin button from issues,
+and both `/pins` and `/pins/toggle` respond with **403 Forbidden**. Existing pins are
+kept in the database and become visible again when the plugin is re-enabled.
+
+Only issues the user is allowed to see are listed on `/pins`, and an issue that is no
+longer visible cannot be pinned.
 
 ## Usage
 
@@ -70,7 +81,7 @@ Compatible with Redmine 6.X and 5.X versions.
 |--------|--------|
 | en     | Full support |
 | lt     | Full support |
-| de     | Not supported |
+| de     | Full support |
 | es     | Not supported |
 | fr     | Not supported |
 | it     | Not supported |
@@ -89,8 +100,20 @@ To add a new translation, simply copy the `config/locales/en.yml` file to your d
 cd /path/to/redmine/plugins/redmine_pin
 git pull
 cd /path/to/redmine
-bundle exec rake redmine:plugins:migrate RAILS_ENV=production
+bundle exec rake redmine:plugins:migrate NAME=redmine_pin RAILS_ENV=production
+bundle exec rake assets:precompile RAILS_ENV=production
 touch tmp/restart.txt
+```
+
+## Running tests
+
+The plugin uses Redmine's own Minitest harness, so run the tests from a Redmine
+6.1.x checkout that has the test gems installed:
+
+```bash
+cd /path/to/redmine
+RAILS_ENV=test bundle exec rake redmine:plugins:migrate NAME=redmine_pin
+RAILS_ENV=test bundle exec rails test plugins/redmine_pin/test
 ```
 
 ## Uninstall
