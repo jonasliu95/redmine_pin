@@ -7,7 +7,7 @@
         <th><%= l(:field_status) %></th>
         <th><%= l(:field_priority) %></th>
         <th><%= l(:field_assigned_to) %></th>
-        <th><%= l(:label_pinned_at, default: 'Pinned At') %></th>
+        <th><%= l(:label_redmine_pin_pinned_at) %></th>
         <th></th>
       </tr>
     </thead>
@@ -21,7 +21,7 @@
           <td class="assigned_to"><%= avatar(pin.issue.assigned_to, size: "14") %> <%= link_to_user(pin.issue.assigned_to) %></td>
           <td class="created_on"><%= format_time(pin.created_at) %></td>
           <td class="buttons">
-             <%= link_to l(:button_unpin, default: 'Unpin'), toggle_pins_path(issue_id: pin.issue.id), method: :post, remote: true, class: 'icon icon-del' %>
+             <%= link_to sprite_icon('pin-off', l(:button_redmine_pin_unpin), plugin: 'redmine_pin'), toggle_pins_path(issue_id: pin.issue.id), method: :post, remote: true, class: 'icon icon-del' %>
           </td>
         </tr>
       <% end %>

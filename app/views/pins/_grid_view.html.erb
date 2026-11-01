@@ -11,7 +11,7 @@
         <p><strong><%= l(:field_assigned_to) %>:</strong> <%= link_to_user(pin.issue.assigned_to) || '-' %></p>
       </div>
       <div class="pin-card-footer">
-        <%= link_to l(:button_unpin, default: 'Unpin'), toggle_pins_path(issue_id: pin.issue.id), method: :post, remote: true, class: 'icon icon-del' %>
+        <%= link_to sprite_icon('pin-off', l(:button_redmine_pin_unpin), plugin: 'redmine_pin'), toggle_pins_path(issue_id: pin.issue.id), method: :post, remote: true, class: 'icon icon-del' %>
       </div>
     </div>
   <% end %>

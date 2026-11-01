@@ -72,6 +72,15 @@ class PinsControllerTest < Redmine::ControllerTest
     end
   end
 
+  def test_toggle_js_replaces_button_with_unpin_state
+    post :toggle, params: { issue_id: 1 }, xhr: true, format: 'js'
+    assert_includes response.body, 'icon--pin-off'
+  end
+
+  def test_core_sort_label_is_not_overridden
+    assert_equal 'Sort', I18n.t(:label_sort, locale: :en)
+  end
+
   def test_toggle_survives_unique_index_race
     other_pin = Pin.create!(user: User.find(2), issue: Issue.find(1))
     Pin.stubs(:find_by).returns(nil) # our lookup ran before the other request committed

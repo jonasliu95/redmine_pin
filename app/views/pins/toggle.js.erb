@@ -1,10 +1,16 @@
-<% if @pinned %>
-  $('#redmine-pin-toggle-btn').removeClass('icon-pin').addClass('icon-unpin').text('<%= j l(:button_unpin, default: "Unpin") %>');
-<% else %>
-  $('#redmine-pin-toggle-btn').removeClass('icon-unpin').addClass('icon-pin').text('<%= j l(:button_pin, default: "Pin") %>');
-  
+$('#redmine-pin-toggle-btn').replaceWith('<%= j render(partial: "pins/toggle_button", locals: { issue: @issue, pinned: @pinned }) %>');
+<% unless @pinned %>
   // If we are on the pins index page, remove the unpinned element instantly
-  $('#pinned-issue-<%= @issue.id %>').fadeOut(300, function() { 
-    $(this).remove(); 
+  $('#pinned-issue-<%= @issue.id %>').fadeOut(300, function() {
+    $(this).remove();
+    $('.project-group').each(function() {
+      if ($(this).find('[id^="pinned-issue-"]').length === 0) {
+        $(this).remove();
+      }
+    });
+    if ($('[id^="pinned-issue-"]').length === 0) {
+      $('.pins-grid, .autoscroll').remove();
+      $('.pins-toolbar').after('<p class="nodata"><%= j l(:label_no_data) %></p>');
+    }
   });
 <% end %>

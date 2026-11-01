@@ -27,7 +27,7 @@ Redmine::Plugin.register :redmine_pin do
   settings default: { 'enabled' => '1' }, partial: 'settings/redmine_pin_settings'
 
   menu :top_menu, :pins, { controller: 'pins', action: 'index' },
-       caption: 'Pins',
+       caption: :label_redmine_pin_pins,
        after: :projects,
        if: proc { User.current.logged? && RedminePin.enabled? }
 end

@@ -1,5 +1,5 @@
 <p>
-  <label><%= l(:setting_plugin_redmine_pin_enabled, default: 'Enable Pinning Feature') %></label>
+  <label><%= l(:setting_redmine_pin_enabled) %></label>
   <%= hidden_field_tag 'settings[enabled]', '0' %>
   <%= check_box_tag 'settings[enabled]', '1', settings['enabled'] == '1' %>
 </p>

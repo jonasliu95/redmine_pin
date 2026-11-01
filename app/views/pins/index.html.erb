@@ -1,14 +1,14 @@
-<h2><%= l(:label_pinned_tasks, default: 'Pinned Tasks') %></h2>
+<h2><%= l(:label_redmine_pin_pinned_tasks) %></h2>
 
 <div class="pins-toolbar">
   <%= form_tag(pins_path, method: :get, id: 'pins_filter_form') do %>
     <div class="filters">
-      <label for="view_mode"><%= l(:label_view_mode, default: 'View Mode') %>:</label>
-      <%= select_tag 'view_mode', options_for_select([[l(:label_view_list, default: 'List'), 'list'], [l(:label_view_grid, default: 'Grid'), 'grid']], @view_mode), onchange: 'this.form.submit();' %>
+      <label for="view_mode"><%= l(:label_redmine_pin_view_mode) %>:</label>
+      <%= select_tag 'view_mode', options_for_select([[l(:label_redmine_pin_view_list), 'list'], [l(:label_redmine_pin_view_grid), 'grid']], @view_mode), onchange: 'this.form.submit();' %>
 
-      <label for="sort"><%= l(:label_sort, default: 'Sort by') %>:</label>
+      <label for="sort"><%= l(:label_redmine_pin_sort_by) %>:</label>
       <%= select_tag 'sort', options_for_select([
-        [l(:label_date_added, default: 'Date Added'), 'date'],
+        [l(:label_redmine_pin_date_added), 'date'],
         [l(:field_project), 'project'],
         [l(:field_status), 'status'],
         [l(:field_priority), 'priority'],
@@ -16,18 +16,18 @@
         [l(:field_assigned_to), 'assignee']
       ], @sort), onchange: 'this.form.submit();' %>
 
-      <%= select_tag 'order', options_for_select([[l(:label_descending, default: 'Descending'), 'desc'], [l(:label_ascending, default: 'Ascending'), 'asc']], @order), onchange: 'this.form.submit();' %>
+      <%= select_tag 'order', options_for_select([[l(:label_descending), 'desc'], [l(:label_ascending), 'asc']], @order), onchange: 'this.form.submit();' %>
 
       <label style="margin-left: 10px;">
         <%= check_box_tag 'group_by_project', '1', @group_by_project, onchange: 'this.form.submit();' %>
-        <%= l(:label_group_by_project, default: 'Group by project') %>
+        <%= l(:label_redmine_pin_group_by_project) %>
       </label>
     </div>
   <% end %>
 </div>
 
 <% if @pins.empty? %>
-  <p class="nodata"><%= l(:label_no_data, default: 'No data to display') %></p>
+  <p class="nodata"><%= l(:label_no_data) %></p>
 <% else %>
   <% if @group_by_project %>
     <% @pins_by_project.keys.sort_by { |p| p ? p.name : '' }.each do |project| %>

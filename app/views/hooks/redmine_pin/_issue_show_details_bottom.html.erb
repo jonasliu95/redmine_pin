@@ -1,15 +1,10 @@
 <% if User.current.logged? && RedminePin.enabled? %>
   <% pinned = Pin.exists?(user_id: User.current.id, issue_id: @issue.id) %>
-  
+
   <div id="redmine-pin-button-container" style="display: none;">
-    <%= link_to (pinned ? 'Unpin' : 'Pin'), 
-                toggle_pins_path(issue_id: @issue.id), 
-                method: :post, 
-                remote: true, 
-                class: "icon #{pinned ? 'icon-unpin' : 'icon-pin'}", 
-                id: 'redmine-pin-toggle-btn' %>
+    <%= render partial: 'pins/toggle_button', locals: { issue: @issue, pinned: pinned } %>
   </div>
-  
+
   <script type="text/javascript">
     $(document).ready(function() {
       // Move the pin button to the contextual menu in the issue box

@@ -1,0 +1,7 @@
+<%= link_to toggle_pins_path(issue_id: issue.id),
+            method: :post,
+            remote: true,
+            class: 'icon redmine-pin-toggle',
+            id: 'redmine-pin-toggle-btn' do %>
+  <%= sprite_icon(pinned ? 'pin-off' : 'pin', l(pinned ? :button_redmine_pin_unpin : :button_redmine_pin_pin), plugin: 'redmine_pin') %>
+<% end %>
